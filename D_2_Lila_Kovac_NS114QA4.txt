@@ -1,0 +1,34 @@
+1.upit:
+SELECT naziv, recept
+FROM jelo
+ORDER BY naziv DESC;
+
+2.upit:
+SELECT adresa
+FROM restoran_objekat
+WHERE radno_vreme = '24';
+
+3.upit:
+SELECT korisnicko_ime
+FROM korisnik
+WHERE br_telefona LIKE '064%';
+
+4.upit:
+SELECT AVG (ukupna_cena)
+FROM narudzbina;
+
+5.upit:
+SELECT id_jelo
+FROM ponuda
+WHERE cena BETWEEN 200 AND 300;
+
+6.upit:
+SELECT SUM (ukupna_cena), id_korisnik
+FROM narudzbina
+GROUP BY id_korisnik;
+
+*Delimično uspeli pokušaj da program ispiše i ime korisnika za 6.upit:
+SELECT SUM (ukupna_cena), korisnik
+FROM narudzbina
+INNER JOIN korisnik ON narudzbina.id_korisnik = korisnik.id_korisnik
+GROUP BY korisnik;

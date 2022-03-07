@@ -1,0 +1,85 @@
+-- 1. prikazati datum, id_korisnik i ukupnu cenu iz narudzbine koja ima sve ocene 5 /*
+SELECT na.datum, na.id_korisnik, na.ukupna_cena FROM narudzbina na
+JOIN ocene oc
+ON na.id_narudzbina = oc.id_narudzbina
+WHERE oc.kvalitet = 5 AND oc.usluga = 5 AND oc.cena = 5;
+
+-- 2. prikazati ime korisnika koji je dao sve 5 za ocene za narudzbinu
+SELECT ko.korisnicko_ime, oc.kvalitet, oc.cena, oc.usluga FROM korisnik ko
+JOIN narudzbina na
+ON ko.id_korisnik = na.id_korisnik
+JOIN ocene oc
+ON na.id_narudzbina = oc.id_narudzbina
+WHERE oc.kvalitet = 5 AND oc.usluga = 5 AND oc.cena = 5;
+
+-- 3. prikazati prosecnu ocenu za uslugu za svakog korisnika (grupisati po korisnicima)
+SELECT AVG(oc.usluga) AS prosecna_ocena, ko.id_korisnik, korisnicko_ime FROM ocene oc
+JOIN narudzbina na
+ON oc.id_narudzbina = na.id_narudzbina 
+JOIN korisnik ko
+ON ko.id_korisnik = na.id_korisnik
+GROUP BY ko.id_korisnik;
+
+-- 4. prikazati prosecnu ocenu za uslugu od ocena koje je dao Pera
+SELECT AVG(oc.usluga) AS prosecna_ocena, ko.korisnicko_ime FROM ocene oc
+JOIN narudzbina na
+ON oc.id_narudzbina = na.id_narudzbina
+JOIN korisnik ko
+ON na.id_korisnik = ko.id_korisnik
+GROUP BY ko.korisnicko_ime
+HAVING ko.korisnicko_ime = 'Pera';
+
+-- 6. prikazati koliko je narudzbina imao svaki restoran (prikazati samo id_restorana i broj narudzbina za taj restoran)
+SELECT na.id_restorana, COUNT(na.id_narudzbina) AS broj_narudzbina FROM narudzbina na
+GROUP BY na.id_restorana;
+
+-- 7. prikazati adrese restorana i sumu koliko je koji restoran zaradio u opadajucem poretku
+SELECT re.adresa, SUM(na.ukupna_cena) AS suma_zarade FROM narudzbina na
+JOIN restoran_objekat re
+ON re.id_restorana = na.id_restorana
+GROUP BY re.id_restorana
+ORDER BY suma_zarade DESC;
+
+-- 8. prikazati koja su jela otisla na koje adrese iz narudzbina  (prikazati NAZIVE jela i adrese iz narudzbine)
+SELECT na.adresa, naziv FROM jelo je
+JOIN ponuda po
+ON po.id_jelo = je.id_jelo
+JOIN narudzbina na
+ON po.id_restorana = na.id_restorana
+ORDER BY na.adresa;
+
+-- 9.  prikazati sta je svaki korisnik narucivao od jela (nazive jela i imena korisnika)
+SELECT ko.korisnicko_ime, naziv FROM jelo je
+JOIN ponuda po
+ON je.id_jelo = po.id_jelo
+JOIN narudzbina na
+ON po.id_restorana = na.id_restorana
+JOIN korisnik ko
+ON na.id_korisnik = ko.id_korisnik
+ORDER BY korisnicko_ime;
+
+
+-- 10.  koliko koji restoran nudi jela (prikazati samo adresu restorana i broj jela)
+SELECT re.adresa, COUNT(je.id_jelo) AS broj_jela FROM jelo je
+JOIN ponuda po
+ON je.id_jelo = po.id_jelo
+JOIN restoran_objekat re
+ON re.id_restorana = po.id_restorana
+GROUP BY re.adresa;
+
+-- 11.  prikazati naziv i recept svakog jela cija je dostupna kolicina veca od 10
+SELECT po.dostupa_kolicina, je.naziv, je.recept FROM jelo je
+JOIN ponuda po
+ON je.id_jelo = po.id_jelo
+WHERE po.dostupa_kolicina > 10;
+
+-- 12. prikazati nazive jela koja su se nasla u sadrzaju narudzbine a da je izabrana kolicina bila 2 ili vise porcije.
+SELECT sa.kolicina, je.naziv FROM jelo je
+JOIN ponuda po
+ON po.id_jelo = je.id_jelo
+JOIN narudzbina na
+ON po.id_restorana = na.id_restorana
+JOIN sadrzaj_narudzbine sa
+ON sa.id_ponude = po.id_ponude
+WHERE sa.kolicina >= 2
+ORDER BY sa.kolicina;
